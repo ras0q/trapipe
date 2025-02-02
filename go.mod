@@ -1,6 +1,6 @@
 module github.com/ras0q/trapipe
 
-go 1.23.5
+go 1.23.4
 
 require github.com/traPtitech/traq-ws-bot v1.2.1
 
