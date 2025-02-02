@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"text/template"
 
 	"github.com/alecthomas/kong"
@@ -36,13 +37,19 @@ func main() {
 	})
 
 	bot.OnMessageCreated(func(p *payload.MessageCreated) {
-		var output bytes.Buffer
-		if err := tmpl.Execute(&output, p); err != nil {
+		var buffer bytes.Buffer
+		if err := tmpl.Execute(&buffer, p); err != nil {
 			ctx.Errorf("execute template: %s", err.Error())
 			return
 		}
 
-		fmt.Println(output.String())
+		output := buffer.String()
+		if strings.Contains(output, "\n") {
+			ctx.Errorf("multiline not supported now")
+			return
+		}
+
+		fmt.Println(output)
 	})
 
 	if err := bot.Start(); err != nil {
