@@ -52,23 +52,19 @@ trapipe receive -t "{{ .Message.ChannelID }} {{ .Message.PlainText }}" |
 Dockerfile
 
 ```dockerfile
-FROM ubuntu:latest
+FROM alpine:latest
 
-RUN apt update && apt install -y ca-certificates
+RUN apk add --no-cache ca-certificates
 
 COPY --from=ghcr.io/ras0q/trapipe /bin/trapipe /bin/trapipe
 
-# 色々な処理...
+SHELL ["/bin/sh", "-c"]
 
-ENV TRAQ_BOT_ACCESS_TOKEN ${TRAQ_BOT_ACCESS_TOKEN}
-ARG ENTRYPOINT_SCRIPT="\
-trapipe receive -t '{{ .Message.ChannelID }} {{ .Message.PlainText }}' | \
-  while read -r channel_id mention cmd args; do \
-    [ \"$mention\" = '@BOT_AWESOME' ] && [ \"$cmd\" = '/my-awesome-cli' ] && \
-    my-awesome-cli \"$args\" | trapipe send --channel-id \"$channel_id\"; \
-  done"
-
-ENTRYPOINT ["sh", "-c", "$ENTRYPOINT_SCRIPT"]
+ENTRYPOINT trapipe receive -t "{{ .Message.ChannelID }} {{ .Message.PlainText }}" | \
+  while read -r channel_id mention args; do \
+    [ "$mention" = "@BOT_AWESOME" ] \
+    && my-awesome-cli $args | trapipe send --channel-id "$channel_id"; \
+  done
 ```
 
 shell
