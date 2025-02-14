@@ -1,20 +1,17 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
-	"strings"
-	"text/template"
-
 	"github.com/alecthomas/kong"
+	"github.com/ras0q/trapipe/commands"
 	traqwsbot "github.com/traPtitech/traq-ws-bot"
-	"github.com/traPtitech/traq-ws-bot/payload"
 )
 
 var cli struct {
-	AccessToken string `help:"BOT Access Token" env:"TRAQ_BOT_ACCESS_TOKEN"`
-	WSOrigin    string `help:"traQ Websocket Origin" default:"wss://q.trap.jp" env:"TRAQ_WS_ORIGIN"`
-	Template    string `help:"Output Template (See https://pkg.go.dev/text/template)" default:"{{ .Message.PlainText }}" short:"t"`
+	AccessToken string `help:"BOT Access Token" env:"TRAQ_BOT_ACCESS_TOKEN" required:""`
+	WSOrigin    string `help:"traQ Websocket Origin" default:"wss://q.trap.jp" env:"TRAQ_WS_ORIGIN" required:""`
+
+	Receive commands.Receive `cmd:"" default:"1" help:"Receive messages from traQ server (default)"`
+	Send    commands.Send    `cmd:"" help:"Send a message to traQ server"`
 }
 
 func main() {
@@ -27,32 +24,10 @@ func main() {
 		panic(err)
 	}
 
-	tmpl, err := template.New("output").Parse(cli.Template)
-	if err != nil {
-		panic(err)
+	commandCtx := commands.Context{
+		Bot: bot,
 	}
-
-	bot.OnError(func(message string) {
-		ctx.Errorf("received ERROR message: %s", message)
-	})
-
-	bot.OnMessageCreated(func(p *payload.MessageCreated) {
-		var buffer bytes.Buffer
-		if err := tmpl.Execute(&buffer, p); err != nil {
-			ctx.Errorf("execute template: %s", err.Error())
-			return
-		}
-
-		output := buffer.String()
-		if strings.Contains(output, "\n") {
-			ctx.Errorf("multiline not supported now")
-			return
-		}
-
-		fmt.Println(output)
-	})
-
-	if err := bot.Start(); err != nil {
+	if err := ctx.Run(&commandCtx); err != nil {
 		panic(err)
 	}
 }
