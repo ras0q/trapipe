@@ -17,25 +17,34 @@ COPY --from=ghcr.io/ras0q/trapipe /bin/trapipe /bin/trapipe
 ## Usage
 
 ```bash
-$ trapipe --help
-Usage: main [flags]
+$ trapipe -h
+Usage: trapipe --access-token=STRING <command> [flags]
 
 Flags:
-  -h, --help                                   Show context-sensitive help.
-      --access-token=STRING                    BOT Access Token ($TRAQ_BOT_ACCESS_TOKEN)
-      --ws-origin="wss://q.trap.jp"            traQ Websocket Origin ($TRAQ_WS_ORIGIN)
-  -t, --template="{{ .Message.PlainText }}"    Output Template (See https://pkg.go.dev/text/template)
+  -h, --help                           Show context-sensitive help.
+      --access-token=STRING            BOT Access Token ($TRAQ_BOT_ACCESS_TOKEN)
+      --ws-origin="wss://q.trap.jp"    traQ Websocket Origin ($TRAQ_WS_ORIGIN)
+
+Commands:
+  receive --access-token=STRING [flags]
+    Receive messages from traQ server (default)
+
+  send --access-token=STRING --channel-id=STRING [flags]
+    Send a message to traQ server
+
+Run "trapipe <command> --help" for more information on a command.
 ```
 
 ### Use with any CLIs
 
 ```bash
 TRAQ_BOT_ACCESS_TOKEN="your access token"
-COMMAND="my-awesome-cli"
 
-trapipe | grep --line-buffered "^$COMMAND" | while read -r _ args; do
-    $COMMAND $args
-done
+trapipe receive -t "{{ .Message.ChannelID }} {{ .Message.PlainText }}" |
+  while read -r channel_id mention args; do
+    [ "$mention" = "@BOT_AWESOME" ] \
+    && my-awesome-cli $args | trapipe send --channel-id "$channel_id"
+  done
 ```
 
 ### Use within Docker
@@ -51,7 +60,15 @@ COPY --from=ghcr.io/ras0q/trapipe /bin/trapipe /bin/trapipe
 
 # 色々な処理...
 
-ENTRYPOINT ["/bin/bash", "-c", "/bin/trapipe | grep --line-buffered '^my-awesome-cli' | while read -r _ args; do my-awesome-cli $args; done"]
+ENV TRAQ_BOT_ACCESS_TOKEN ${TRAQ_BOT_ACCESS_TOKEN}
+ARG ENTRYPOINT_SCRIPT="\
+trapipe receive -t '{{ .Message.ChannelID }} {{ .Message.PlainText }}' | \
+  while read -r channel_id mention cmd args; do \
+    [ \"$mention\" = '@BOT_AWESOME' ] && [ \"$cmd\" = '/my-awesome-cli' ] && \
+    my-awesome-cli \"$args\" | trapipe send --channel-id \"$channel_id\"; \
+  done"
+
+ENTRYPOINT ["sh", "-c", "$ENTRYPOINT_SCRIPT"]
 ```
 
 shell
