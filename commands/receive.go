@@ -43,7 +43,7 @@ func (c *Receive) Run(ctx *Context) error {
 
 		output := buffer.String()
 		if strings.Contains(output, "\n") {
-			slog.Error("multiline not supported now")
+			slog.Error("multiline is not supported. Use `json` function")
 			return
 		}
 
