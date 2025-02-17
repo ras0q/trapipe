@@ -2,10 +2,11 @@ package commands
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
-	"html/template"
 	"log/slog"
 	"strings"
+	"text/template"
 
 	"github.com/traPtitech/traq-ws-bot/payload"
 )
@@ -17,7 +18,14 @@ type Receive struct {
 var _ Runner = (*Receive)(nil)
 
 func (c *Receive) Run(ctx *Context) error {
-	tmpl, err := template.New("output").Parse(c.Template)
+	tmpl, err := template.New("output").
+		Funcs(template.FuncMap{
+			"json": func(v any) string {
+				encoded, _ := json.Marshal(v)
+				return string(encoded)
+			},
+		}).
+		Parse(c.Template)
 	if err != nil {
 		panic(err)
 	}

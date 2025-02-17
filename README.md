@@ -47,6 +47,20 @@ trapipe receive -t "{{ .Message.ChannelID }} {{ .Message.PlainText }}" |
   done
 ```
 
+With `jq`
+
+```bash
+trapipe receive -t "{{ json . }}" | jq -r --unbuffered '
+   (.message.plainText | split(" ")) as $args
+   | select(.message.embedded[]?.raw == $args[0])
+   | [.message.channelId, ($args[1:] | join(" "))]
+   | @tsv
+   ' |
+  while IFS=$'\t' read -r channel_id args; do
+    my-awesome-cli $args | trapipe send --channel-id $channel_id
+  done
+```
+
 ### Use within Docker
 
 Dockerfile
