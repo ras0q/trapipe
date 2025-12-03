@@ -3,7 +3,7 @@ module github.com/ras0q/trapipe
 go 1.23.4
 
 require (
-	github.com/alecthomas/kong v1.7.0
+	github.com/alecthomas/kong v1.13.0
 	github.com/traPtitech/go-traq v0.0.0-20240725071454-97c7b85dc879
 	github.com/traPtitech/traq-ws-bot v1.2.1
 )
