@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  pull_request:
 
 permissions:
   packages: write
@@ -11,11 +12,18 @@ permissions:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tag:
+          - latest
+          - alpine
+          - golang
     env:
       IMAGE: "ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}"
     steps:
       - uses: actions/checkout@v4
       - uses: docker/login-action@v3
+        if: github.event_name == 'push'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -25,10 +33,11 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
           tags: |
-            type=raw,value=latest
+            type=raw,value=${{ matrix.tag }}
             type=sha,prefix=,suffix=,format=short
       - uses: docker/build-push-action@v6
         with:
-          push: true
+          push: ${{ github.event_name == 'push' }}
+          target: tag-${{ matrix.tag }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}

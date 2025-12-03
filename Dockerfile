@@ -17,5 +17,14 @@ RUN \
     --mount=target=. \
     go build -ldflags="-s -w" -o /bin/trapipe /app
 
-FROM scratch
+FROM scratch AS tag-latest
 COPY --from=builder /bin/trapipe /bin/trapipe
+
+FROM alpine AS tag-alpine
+RUN apk add --no-cache ca-certificates
+COPY --from=builder /bin/trapipe /bin/trapipe
+ENTRYPOINT ["/bin/trapipe"]
+
+FROM golang AS tag-golang
+COPY --from=builder /bin/trapipe /bin/trapipe
+ENTRYPOINT ["/bin/trapipe"]
