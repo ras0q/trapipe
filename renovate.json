@@ -4,5 +4,8 @@
     "config:best-practices",
     "schedule:monthly",
     ":automergeMinor"
+  ],
+  "postUpdateOptions": [
+    "gomodTidy"
   ]
 }
