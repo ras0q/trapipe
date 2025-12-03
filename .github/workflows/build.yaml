@@ -42,5 +42,5 @@ jobs:
           target: tag-${{ matrix.tag }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=build-${{ matrix.tag }}
+          cache-to: type=gha,mode=max,scope=build-${{ matrix.tag }}
