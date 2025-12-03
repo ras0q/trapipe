@@ -1,11 +1,12 @@
 module github.com/ras0q/trapipe
 
-go 1.23.4
+go 1.24.0
 
 require (
 	github.com/alecthomas/kong v1.13.0
 	github.com/traPtitech/go-traq v0.0.0-20251201015624-285ca186fc5e
 	github.com/traPtitech/traq-ws-bot v1.2.1
+	golang.org/x/sync v0.18.0
 )
 
 require (

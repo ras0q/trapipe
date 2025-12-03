@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"strings"
 	"text/template"
 
 	"github.com/traPtitech/traq-ws-bot/payload"
+	"golang.org/x/sync/errgroup"
 )
 
 type Receive struct {
@@ -27,32 +27,40 @@ func (c *Receive) Run(ctx *Context) error {
 		}).
 		Parse(c.Template)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("parse template: %w", err)
 	}
 
+	errCh := make(chan error, 1)
+
 	ctx.Bot.OnError(func(message string) {
-		slog.Error("received ERROR message", slog.String("message", message))
+		errCh <- fmt.Errorf("received ERROR message: %s", message)
 	})
 
 	ctx.Bot.OnMessageCreated(func(p *payload.MessageCreated) {
 		var buffer bytes.Buffer
 		if err := tmpl.Execute(&buffer, p); err != nil {
-			slog.Error("execute template", slog.Any("err", err))
+			errCh <- fmt.Errorf("execute template: %w", err)
 			return
 		}
 
 		output := buffer.String()
 		if strings.Contains(output, "\n") {
-			slog.Error("multiline is not supported. Use `json` function")
+			errCh <- fmt.Errorf("multiline is not supported. Use `json` function")
 			return
 		}
 
 		fmt.Println(output)
 	})
 
-	if err := ctx.Bot.Start(); err != nil {
-		return err
-	}
+	eg := errgroup.Group{}
+	eg.Go(ctx.Bot.Start)
+	eg.Go(func() error {
+		if err := <-errCh; err != nil {
+			return fmt.Errorf("handler error: %w", err)
+		}
 
-	return nil
+		return nil
+	})
+
+	return eg.Wait()
 }

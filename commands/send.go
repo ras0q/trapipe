@@ -19,7 +19,7 @@ var _ Runner = (*Send)(nil)
 func (c *Send) Run(ctx *Context) error {
 	data, err := io.ReadAll(os.Stdin)
 	if err != nil {
-		return err
+		return fmt.Errorf("read stdin: %w", err)
 	}
 
 	message := string(data)
@@ -29,7 +29,7 @@ func (c *Send) Run(ctx *Context) error {
 		PostMessageRequest(traq.PostMessageRequest{Content: message}).
 		Execute()
 	if err != nil {
-		return err
+		return fmt.Errorf("post message: %w", err)
 	}
 	if resp.StatusCode != http.StatusCreated {
 		return fmt.Errorf("invalid status (%d %s)", resp.StatusCode, resp.Status)
