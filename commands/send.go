@@ -24,7 +24,7 @@ func (c *Send) Run(ctx *Context) error {
 
 	message := string(data)
 	_, resp, err := ctx.Bot.API().
-		ChannelApi.
+		ChannelAPI.
 		PostMessage(context.Background(), c.ChannelID).
 		PostMessageRequest(traq.PostMessageRequest{Content: message}).
 		Execute()
