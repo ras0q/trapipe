@@ -16,7 +16,11 @@ github.com/hexops/gotextdiff v1.0.3 h1:gitA9+qJrrTCsiCl7+kh75nPqQt1cx4ZkudSTLoUq
 github.com/hexops/gotextdiff v1.0.3/go.mod h1:pSWU5MAI3yDq+fZBTazCSJysOMbxWL1BSow5/V2vxeg=
 github.com/traPtitech/go-traq v0.0.0-20240725071454-97c7b85dc879 h1:kkMhrXZXa7aP57ay31a3AydSPcDU1K73vXRYrSPs+P8=
 github.com/traPtitech/go-traq v0.0.0-20240725071454-97c7b85dc879/go.mod h1:7yJs1m/ddCG39XF78GA8FrXqyc4fNPfHp8BSLjMVMY8=
+github.com/traPtitech/go-traq v0.0.0-20251201015624-285ca186fc5e h1:CPWnxqmdaYKFIw/OtXQeucdkmqgB+3HTNQw2Tu1IImQ=
+github.com/traPtitech/go-traq v0.0.0-20251201015624-285ca186fc5e/go.mod h1:D7NRbLYlvMey05bV+3Yqea6+Onj0ACmMgLuvP7+far8=
 github.com/traPtitech/traq-ws-bot v1.2.1 h1:DYXrVsInXAqWExltqRCvg3o0KYa2EZkaRc2Q7Gr+lzM=
 github.com/traPtitech/traq-ws-bot v1.2.1/go.mod h1:9M6DRpFVfiuGR6sJwOQ0ZbgF9WQJvoBWCsPLekiZdtM=
 golang.org/x/oauth2 v0.22.0 h1:BzDx2FehcG7jJwgWLELCdmLuxk2i+x9UDpSiss2u0ZA=
 golang.org/x/oauth2 v0.22.0/go.mod h1:XYTD2NtWslqkgxebSiOHnXEap4TF09sJSc7H1sXbhtI=
+gopkg.in/validator.v2 v2.0.1 h1:xF0KWyGWXm/LM2G1TrEjqOu4pa6coO9AlWSf3msVfDY=
+gopkg.in/validator.v2 v2.0.1/go.mod h1:lIUZBlB3Im4s/eYp39Ry/wkR02yOPhZ9IwIRBjuPuG8=
