@@ -63,22 +63,26 @@ trapipe receive -t "{{ json . }}" | jq -r --unbuffered '
 
 ### Use within Docker
 
+trapipe は以下の Docker イメージを提供しています。
+
+- `trapipe` (Base: `scratch`)
+- `trapipe:alpine` (Base: `alpine`)
+- `trapipe:golang` (Base: `golang`)
+
+詳しくは [Packages](https://github.com/ras0q/trapipe/pkgs/container/trapipe) を参照してください。
+
+シェルが使用可能なイメージでは、 `ENTRYPOINT` にペイロードを読み込む機能が組み込まれています ([./docker-entrypoint.sh](./docker-entrypoint.sh)) 。
+`CMD` に実行したいコマンドを与えることで、すぐにBOTを動かすことが可能です。
+`CMD` に加え、最後の引数に `MESSAGE_CREATED` イベントの JSON ペイロードが渡されることに注意してください。
+
 Dockerfile
 
 ```dockerfile
-FROM alpine:latest
+FROM trapipe:alpine
 
-RUN apk add --no-cache ca-certificates
-
-COPY --from=ghcr.io/ras0q/trapipe /bin/trapipe /bin/trapipe
-
-SHELL ["/bin/sh", "-c"]
-
-ENTRYPOINT trapipe receive -t "{{ .Message.ChannelID }} {{ .Message.PlainText }}" | \
-  while read -r channel_id mention args; do \
-    [ "$mention" = "@BOT_AWESOME" ] \
-    && my-awesome-cli $args | trapipe send --channel-id "$channel_id"; \
-  done
+COPY ./test.sh ./test.sh
+# BOT が MESSAGE_CREATED イベントを受け取るたびに `./test.sh '{"eventTime": ..., "message": ...}'` が実行されます。
+CMD ["./test.sh"]
 ```
 
 shell
