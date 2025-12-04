@@ -10,5 +10,5 @@ exec trapipe receive -t "{{ json . }}" |
   # Ref: https://bot-console.trap.jp/docs/bot/events/message
   while read -r payload; do
     channel_id=$(echo "$payload" | jq -r '.message.channelId')
-    $@ "'$payload'" | trapipe send --channel-id "$channel_id"
+    $@ "$payload" | trapipe send --channel-id "$channel_id"
   done
