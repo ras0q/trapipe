@@ -20,7 +20,7 @@ RUN \
 FROM scratch AS tag-latest
 COPY --from=builder /bin/trapipe /bin/trapipe
 
-FROM alpine@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412 AS tag-alpine
+FROM alpine@sha256:25109184c71bdad752c8312a8623239686a9a2071e8825f20acb8f2198c3f659 AS tag-alpine
 RUN apk add --no-cache ca-certificates jq
 COPY --from=builder /bin/trapipe /bin/trapipe
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
